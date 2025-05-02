@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .business-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .business-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .business-name {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-icon {
+            color: var(--primary-color);
+            width: 24px;
+            text-align: center;
+            margin-right: 8px;
+        }
+        
+        .btn-search {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-search:hover {
+            background-color: #3367d6;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            background-color: #fde8e8;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-3">Business Finder</h1>
+            <p class="lead">Discover local businesses in your area</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="search-card">
+                    <form method="POST">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control form-control-lg" id="location" name="location" required placeholder="e.g., New York, Jaipur">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="business_type" class="form-label">Business Type</label>
+                                <select class="form-select form-select-lg" id="business_type" name="business_type" required>
+                                    <option value="">Select a business type</option>
+                                    <option value="pharmacy">Pharmacy</option>
+                                    <option value="hotel">Hotel</option>
+                                    <option value="restaurant">Restaurant</option>
+                                    <option value="bank">Bank</option>
+                                    <option value="gym">Gym</option>
+                                    <option value="hair_care">Salon</option>
+                                    <option value="store">Store</option>
+                                </select>
+                            </div>
+                            <div class="col-12 text-center mt-3">
+                                <button type="submit" class="btn btn-primary btn-lg btn-search">
+                                    <i class="fas fa-search me-2"></i>Search Businesses
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {% if error %}
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                </div>
+                {% endif %}
+
+                {% if businesses %}
+                <h3 class="mb-4">Results ({{ businesses|length }})</h3>
+                
+                <div class="row">
+                    {% for business in businesses %}
+                    <div class="col-md-6">
+                        <div class="business-card">
+                            <h4 class="business-name">{{ business.name }}</h4>
+                            <div class="info-item">
+                                <span class="info-icon"><i class="fas fa-phone"></i></span>
+                                <span>{{ business.phone }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon"><i class="fas fa-map-marker-alt"></i></span>
+                                <span>{{ business.address }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon"><i class="fas fa-globe"></i></span>
+                                {% if business.website != 'N/A' %}
+                                <a href="{{ business.website }}" target="_blank">Visit Website</a>
+                                {% else %}
+                                <span class="text-muted">Website not available</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% elif request.method == 'POST' and not error %}
+                <div class="no-results">
+                    <i class="fas fa-search fa-3x mb-3" style="color: #ccc;"></i>
+                    <h4>No businesses found</h4>
+                    <p>Try adjusting your search criteria</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
