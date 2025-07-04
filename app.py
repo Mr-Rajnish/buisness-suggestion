@@ -93,7 +93,7 @@ def index():
                         open_now=False
                     )
                     
-                    for place in places_result.get('results', [])[:5]:
+                    for place in places_result.get('results', [])[:10]:
                         @daily_rate_limiter
                         def get_place_details(place_id, fields):
                             return gmaps.place(place_id, fields=fields)
